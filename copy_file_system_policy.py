@@ -59,7 +59,7 @@ def test_copy_file_system_policy(self, mock_get_client):
     }
 
     # Default policy to use if no specific policy is found
-    default_policy = {
+    default_policy = json.dumps({
         "Sid": "DenyInSecureTransport",
         "Effect": "Deny",
         "Principal": {"AWS": "*"},
@@ -68,7 +68,7 @@ def test_copy_file_system_policy(self, mock_get_client):
         "Condition": {
             "Bool": {"aws:SecureTransport": "false"}
         }
-    }
+    })
 
     # Mock EFS client
     mock_efs_client = MagicMock()
@@ -104,3 +104,4 @@ def test_copy_file_system_policy(self, mock_get_client):
 
     # Verify get_client is called with the correct service and region
     mock_get_client.assert_called_with("efs", "us-west-2")
+
