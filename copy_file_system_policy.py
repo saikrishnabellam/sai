@@ -59,7 +59,7 @@ def test_copy_file_system_policy(self, mock_get_client):
     }
 
     # Default policy to use if no specific policy is found
-    default_policy = json.dumps({
+    default_policy_dict = {
         "Sid": "DenyInSecureTransport",
         "Effect": "Deny",
         "Principal": {"AWS": "*"},
@@ -68,25 +68,20 @@ def test_copy_file_system_policy(self, mock_get_client):
         "Condition": {
             "Bool": {"aws:SecureTransport": "false"}
         }
-    })
+    }
+    default_policy = json.dumps(default_policy_dict)
 
     # Mock EFS client
     mock_efs_client = MagicMock()
-    mock_get_client.return_value = mock_efs_client
+    mock_get_client.side_effect = lambda service, region: mock_efs_client if service == "efs" else None
 
-    # Simulate the source EFS having no specific policy
+    # Simulate the source EFS having no specific policy by raising PolicyNotFound
     mock_efs_client.describe_file_system_policy.side_effect = (
-        mock_efs_client.exceptions.FileSystemPolicyNotFound(
-            error_response={"Error": {"Code": "FileSystemPolicyNotFound"}},
-            operation_name="DescribeFileSystemPolicy"
-        )
+        mock_efs_client.exceptions.PolicyNotFound
     )
 
     # Mock put_file_system_policy response
     mock_efs_client.put_file_system_policy.return_value = {}
-
-    # Import the function to test
-    from module_name import copy_file_system_policy
 
     # Call the function
     copy_file_system_policy(**kwargs)
@@ -104,4 +99,5 @@ def test_copy_file_system_policy(self, mock_get_client):
 
     # Verify get_client is called with the correct service and region
     mock_get_client.assert_called_with("efs", "us-west-2")
+
 
