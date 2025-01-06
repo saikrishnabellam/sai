@@ -18,11 +18,11 @@ Upon successful execution of the EFS restoration workflow, the following resourc
 ## Runbook Inputs and Parameter Combinations
 The workflow requires specific inputs that determine the restoration behavior. Below are the primary input parameters:
 
-| **Parameter Name**          | **Parameter Description**                                           | **Required (Yes/No)** |
+| **Parameter Name**          | **Parameter Description**                                           | **Required** |
 |-----------------------------|---------------------------------------------------------------------|-----------------------|
-| `RecoveryPointArn`          | ARN of the recovery point to restore from.                         | No                   |
+| `RecoveryPointArn`          | ARN of the recovery point to restore from.                         | Maybe                   |
 | `SourceEfsFileSystemArn`    | ARN of the source EFS file system.                                | Yes                  |
-| `RestoreTime`               | Specifies the desired restore time.                               | No                   |
+| `RestoreTime`               | Specifies the desired restore time.                               | Maybe                   |
 | `FileSystemID`              | ID of the file system to be restored.                            | Yes                  |
 | `NewFileSystemName`         | Specifies a new name for the restored EFS.                       | Yes                  |
 | `KmsKeyId`                  | Specifies the KMS key for encryption.                           | Yes                  |
