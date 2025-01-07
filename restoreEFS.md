@@ -101,6 +101,57 @@ The workflow requires specific inputs that determine the restoration behavior. B
    - Prints a failure message if the restoration fails.
 
 ---
+```mermaid
+flowchart TD
+    start((Start))
+    decision1{Is RecoveryPointArn Provided?}
+    decision2{Is RestoreTime Provided?}
+    decision3{Is Recovery Point Available for FileSystemArn?}
+    success[Proceed with RecoveryPointArn]
+    error1[Log Error: No Recovery Point Found Before RestoreTime]
+    error2[Log Error: No Recovery Point Found]
+    restore_snapshot[Snapshot Restore]
+    poll_restore[Poll until restoration job is completed]
+    end_process((End))
 
-This document serves as a comprehensive guide to understanding and using the EFS restoration workflow for end users.
+    start --> decision1
+    decision1 -- Yes --> success --> restore_snapshot --> poll_restore --> end_process
+    decision1 -- No --> decision2
+    decision2 -- Yes --> find_closest[Find Closest Recovery Point]
+    find_closest -- Recovery Point Found --> restore_snapshot
+    find_closest -- No Recovery Point Found --> error1 --> end_process
 
+    decision2 -- No --> decision3
+    decision3 -- Yes --> retrieve_latest[Retrieve Latest Recovery Point] --> restore_snapshot
+    decision3 -- No --> error2 --> end_process
+
+    restore_snapshot --> poll_restore
+
+
+
+```
+
+**DISCLAIMER:**
+
+This runbook facilitates the restoration of an Amazon Elastic File System (EFS) from AWS Backup recovery points. While the process attempts to replicate core metadata and configurations from the source file system, certain limitations exist:
+
+### Limitations:
+- **Incomplete Metadata Restoration:**
+   - EFS snapshots capture file system data, file permissions, encryption settings, and file system policies.
+   - **Network configurations** (such as mount targets, subnets, and security groups) are not captured in the snapshot and must be manually reconfigured.
+   - **File-level permissions and ownership** (POSIX) are included in the snapshot but may require validation post-restoration.
+
+### Usage Considerations:
+- This script is provided for **educational** and **operational** use with AWS Backup services.
+- Ensure proper validation and testing in a **non-production** environment before applying in production.
+- The user assumes responsibility for ensuring the integrity of restored data.
+
+### Security and Liability:
+- Ensure appropriate **IAM permissions** are granted to execute the restoration workflow.
+- **KMS Keys** used for encryption must be verified to avoid data access issues.
+- The authors and contributors disclaim any liability for:
+   - Data loss or corruption.
+   - Service disruptions or compliance failures.
+   - Financial or operational impacts resulting from using this code.
+
+By using this script, you acknowledge and agree to these terms and accept full responsibility for its use in your AWS environment.
