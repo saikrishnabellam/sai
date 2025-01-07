@@ -130,12 +130,12 @@ flowchart TD
 
 
 ```
+---
+## Disclaimer
 
-**DISCLAIMER:**
 
 This runbook restores an Amazon EFS from AWS Backup recovery points but may not fully replicate all configurations.
-
-**Note:** This runbook attempts to perform compliant restores on a best-effort basis. The restoration process may vary based on the existence of the source EFS:
+This runbook attempts to perform compliant restores on a best-effort basis. The restoration process may vary based on the existence of the source EFS:
 - **If the source EFS exists:** Tags and policies will be copied from the source.
 - **If the source EFS no longer exists:** Default tags and policies will be applied based on compliance standards.
 
