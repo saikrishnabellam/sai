@@ -30,3 +30,39 @@ def get_source_file_system_arn(**kwargs) -> str:
     except Exception as e:
         raise RuntimeError(f"Failed to retrieve the source file system ARN for FileSystemID: {kwargs.get('FileSystemID')} "
                            f"in Region: {kwargs.get('Region')}. Error: {str(e)}")
+
+
+@patch("my_efs_module.get_client")
+def test_get_source_file_system_arn_success(self, mock_get_client):
+    """Test successful retrieval of the EFS ARN."""
+    # Arrange
+    mock_efs_client = MagicMock()
+    mock_efs_client.describe_file_systems.return_value = {
+        "FileSystems": [
+            {"FileSystemArn": "arn:aws:efs:us-east-1:123456789012:file-system/fs-12345"}
+        ]
+    }
+    mock_get_client.return_value = mock_efs_client
+
+    # Act
+    result = get_source_file_system_arn(FileSystemID="fs-12345", Region="us-east-1")
+
+    # Assert
+    self.assertEqual(result, "arn:aws:efs:us-east-1:123456789012:file-system/fs-12345")
+    mock_efs_client.describe_file_systems.assert_called_once_with(FileSystemId="fs-12345")
+
+@patch("my_efs_module.get_client")
+def test_get_source_file_system_arn_not_found(self, mock_get_client):
+    """Test when the EFS file system is not found."""
+    # Arrange
+    mock_efs_client = MagicMock()
+    error_response = {"Error": {"Code": "FileSystemNotFound", "Message": "Not Found"}}
+    mock_efs_client.describe_file_systems.side_effect = Exception("FileSystemNotFound")
+    mock_get_client.return_value = mock_efs_client
+
+    # Act & Assert
+    with self.assertRaises(RuntimeError) as context:
+        get_source_file_system_arn(FileSystemID="fs-99999", Region="us-east-1")
+
+    self.assertIn("Failed to retrieve the source file system ARN", str(context.exception))
+    mock_efs_client.describe_file_systems.assert_called_once_with(FileSystemId="fs-99999")
