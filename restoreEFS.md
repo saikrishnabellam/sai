@@ -133,25 +133,12 @@ flowchart TD
 
 **DISCLAIMER:**
 
-This runbook facilitates the restoration of an Amazon Elastic File System (EFS) from AWS Backup recovery points. While the process attempts to replicate core metadata and configurations from the source file system, certain limitations exist:
+This runbook restores an Amazon EFS from AWS Backup recovery points but may not fully replicate all configurations.
 
-### Limitations:
-- **Incomplete Metadata Restoration:**
-   - EFS snapshots capture file system data, file permissions, encryption settings, and file system policies.
-   - **Network configurations** (such as mount targets, subnets, and security groups) are not captured in the snapshot and must be manually reconfigured.
-   - **File-level permissions and ownership** (POSIX) are included in the snapshot but may require validation post-restoration.
+**Note:** This runbook attempts to perform compliant restores on a best-effort basis. The restoration process may vary based on the existence of the source EFS:
+- **If the source EFS exists:** Tags and policies will be copied from the source.
+- **If the source EFS no longer exists:** Default tags and policies will be applied based on compliance standards.
 
-### Usage Considerations:
-- This script is provided for **educational** and **operational** use with AWS Backup services.
-- Ensure proper validation and testing in a **non-production** environment before applying in production.
-- The user assumes responsibility for ensuring the integrity of restored data.
 
-### Security and Liability:
-- Ensure appropriate **IAM permissions** are granted to execute the restoration workflow.
-- **KMS Keys** used for encryption must be verified to avoid data access issues.
-- The authors and contributors disclaim any liability for:
-   - Data loss or corruption.
-   - Service disruptions or compliance failures.
-   - Financial or operational impacts resulting from using this code.
 
 By using this script, you acknowledge and agree to these terms and accept full responsibility for its use in your AWS environment.
